@@ -1,76 +1,77 @@
+<!-- createEmployee.ejs -->
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!-- <link rel="stylesheet" type="text/css" href="/css/styles.css"> -->
+  <style>
+    /* Reset some default styles for better consistency */
+    body,
+    h1,
+    form {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #007bff;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    a {
+      display: block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: #007bff;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
-<style> 
-  /* Reset some default styles for better consistency */
-body,
-h1,
-form {
-margin: 0;
-padding: 0;
-}
-
-body {
-font-family: Arial, sans-serif;
-background-color: #f4f4f4;
-color: #333;
-line-height: 1.6;
-padding: 20px;
-}
-
-h1 {
-color: #007bff;
-}
-
-form {
-background-color: #fff;
-padding: 20px;
-border-radius: 5px;
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-margin-top: 20px;
-}
-
-label {
-display: block;
-margin-bottom: 5px;
-}
-
-input {
-width: 100%;
-padding: 8px;
-margin-bottom: 10px;
-box-sizing: border-box;
-border: 1px solid #ccc;
-border-radius: 4px;
-}
-
-button {
-background-color: #007bff;
-color: #fff;
-padding: 10px 15px;
-border: none;
-border-radius: 4px;
-cursor: pointer;
-}
-
-button:hover {
-background-color: #0056b3;
-}
-
-a {
-display: block;
-margin-top: 10px;
-text-decoration: none;
-color: #007bff;
-}
-
-a:hover {
-text-decoration: underline;
-}
-</style>
 
 <body>
   <h1>Create Employee</h1>
@@ -90,37 +91,72 @@ text-decoration: underline;
     <button type="button" onclick="createEmployee()">Create Employee</button>
   </form>
 
+  <a href="#" onclick="promptForEmployeeId()">Update Employee</a>
   <a href="/employee/showAll">Show All Employees</a>
-  <a href="/employee/update">Update Employee</a>
-  <a href="/employee/delete">Delete Employee</a>
+  <a href="#" onclick="promptForDeleteEmployeeId()">Delete Employee</a>
 
+ <!-- ... Your existing HTML code ... -->
 
-  <!-- <script src="js/scripts.js"></script> -->
+<script>
+  async function createEmployee() {
+    const formData = new FormData(document.getElementById("createEmployeeForm"));
+    const userData = {};
+    formData.forEach((value, key) => {
+      userData[key] = value;
+    });
 
-  <script>
-       async function createEmployee() {
-      const formData = new FormData(document.getElementById("createEmployeeForm"));
-      const userData = {};
-      formData.forEach((value, key) => {
-        userData[key] = value;
+    try {
+      const response = await fetch('/employee/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
       });
 
-      try {
-        const response = await fetch('/employee/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userData),
-        });
+      const result = await response.json();
+      console.log(result);
 
-        const result = await response.json();
-        console.log(result);
-      } catch (error) {
-        console.error(error);
-      }
+      // Save data in local storage
+      saveEmployeeToLocalstorage(result.employee);
+    } catch (error) {
+      console.error(error);
     }
-  </script>
+  }
+
+  function saveEmployeeToLocalstorage(employee) {
+    // Retrieve existing data from local storage
+    const existingData = JSON.parse(localStorage.getItem('employeesData')) || [];
+
+    // Add new employee to the existing data
+    existingData.push(employee);
+
+    // Save the updated data back to local storage
+    localStorage.setItem('employeesData', JSON.stringify(existingData));
+  }
+
+  function promptForEmployeeId() {
+    const employeeId = prompt("Enter Employee ID:");
+
+    if (employeeId) {
+      window.location.href = `/employee/update/${employeeId}`;
+    } else {
+      alert("Employee ID is not Found...! ");
+    }
+  }
+
+  function promptForDeleteEmployeeId() {
+    const employeeId = prompt("Enter Employee ID to delete:");
+
+    if (employeeId) {
+      // Redirect to the delete route with the provided ID
+      window.location.href = `/employee/delete/${employeeId}`;
+    } else {
+      alert("Employee ID is not provided. Deletion canceled.");
+    }
+  }
+</script>
+
 </body>
 
 </html>

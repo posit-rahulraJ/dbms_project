@@ -77,28 +77,35 @@ a:hover {
 </head>
 <!-- ... existing content ... -->
 <body>
-    <h1>Delete Employee</h1>
-    <p>Are you sure you want to delete this employee?</p>
-    <button type="button" onclick="deleteEmployee('<%= employee.id %>')">Delete Employee</button>
-    <a href="/employee/create">Create Employee</a>
-    <a href="/employee/showAll">Show All Employees</a>
-    <a href="/employee/update/<%= employee.id %>">Update Employee</a>
-    <!-- <script src="js/scripts.js"></script> -->
-    <script>
-      // Fetch the employee ID from the delete button
-      const deleteButton = document.getElementById('deleteButton');
-      const employeeId = deleteButton.getAttribute('data-employee-id');
-    
-      // Add click event listener to the delete button
-      deleteButton.addEventListener('click', function() {
-        deleteEmployee(employeeId);
-      });
-    
-      function deleteEmployee(id) {
-        // Your delete functionality here
-        console.log('Deleting employee with ID:', id);
-      }
-    </script>
+  <h1>Delete Employee</h1>
+  <p>Are you sure you want to delete this employee?</p>
+  <button id="deleteButton" type="button" onclick="deleteEmployee('<%= employee.id %>')">Delete Employee</button>
+  <a href="/employee/create">Create Employee</a>
+  <a href="/employee/showAll">Show All Employees</a>
+  <a href="/employee/update/<%= employee.id %>">Update Employee</a>
+  <!-- <script src="js/scripts.js"></script> -->
+  <script>
+    const deleteButton = document.getElementById('deleteButton');
+  
+    // Add click event listener to the delete button
+    deleteButton.addEventListener('click', function() {
+      deleteEmployee('<%= employee.id %>');
+    });
+  
+    function deleteEmployee(id) {
+      // Make an asynchronous request to delete the employee on the server
+      fetch(`/employee/delete/${id}`, {
+        method: 'POST',
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data.message);
+          // Optionally, you can redirect or perform other actions after deletion
+        })
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+  
     
 </body>
   <!-- ... existing content ... -->
